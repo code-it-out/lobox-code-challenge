@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import 'sanitize.css';
 
+import './index.scss';
 import { App } from './components';
 import reportWebVitals from './reportWebVitals';
 

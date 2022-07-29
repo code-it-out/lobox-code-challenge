@@ -1,24 +1,27 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+
+import { Components } from '../../types';
+import Select from '../select/Select';
 
 function App() {
+  const onChange = (option: Components.Select.Option) => {
+    console.log('onChange', option);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ padding: '20px' }}>
+      <Select
+        options={[
+          { label: 'Education 🎓', text: 'Education' },
+          { label: 'Yeeeah, science! 🚀', text: 'Science' },
+          { label: 'Art 🎭', text: 'Art' },
+          { label: 'Sport ⚽', text: 'Sport' },
+          { label: 'Game 🎮', text: 'Game' },
+          { label: 'Health 👨‍⚕️', text: 'Health' },
+        ]}
+        onChange={onChange}
+        placeholder="Select an item..."
+      />
     </div>
   );
 }
