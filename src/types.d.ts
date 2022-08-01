@@ -1,3 +1,11 @@
+export namespace Hooks {
+  namespace UseClickOutside {
+    interface VoidCallback {
+      (): void;
+    }
+  }
+}
+
 export namespace Components {
   namespace Select {
     interface Option {
