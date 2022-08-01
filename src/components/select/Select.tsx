@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import styles from './select.module.scss';
 
 import { Components } from '../../types';
+import { useClickOutside, usePressEsc } from '../../hooks';
 
 export const handleChange = () => null;
 
@@ -18,6 +19,16 @@ export function Select({
   const menuRef = React.useRef<HTMLUListElement>(null);
   const focusedItemRef = React.useRef(-1);
   const selectedItemRef = React.useRef(-1);
+
+  const closeMenu = React.useCallback(() => {
+    if (isOpen) {
+      setIsOpen(false);
+      buttonRef?.current?.focus();
+    }
+  }, [isOpen, buttonRef]);
+
+  useClickOutside(buttonRef, closeMenu);
+  usePressEsc(closeMenu);
 
   const handleClickOnButton = () => {
     setIsOpen((open) => !open);
@@ -58,27 +69,6 @@ export function Select({
   const handleKeyDownOnItem = (evt: React.KeyboardEvent<HTMLLIElement>) => {
     if (evt.key === 'Enter') { doChange(); }
   };
-
-  React.useEffect(() => {
-    const handleClickOutside = (evt: MouseEvent) => {
-      if (buttonRef.current && !buttonRef.current.contains(evt.target as HTMLElement)) {
-        setIsOpen(false);
-      }
-    };
-    const handlePressEsc = (evt: KeyboardEvent) => {
-      if (evt.key === 'Escape' && isOpen) {
-        setIsOpen(false);
-        buttonRef?.current?.focus();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handlePressEsc);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handlePressEsc);
-    };
-  }, [buttonRef, isOpen]);
 
   return (
     <button

@@ -1,4 +1,4 @@
-// testing initial functionalities.
+// testing basic functionalities.
 
 import { fireEvent, render, screen } from '@testing-library/react';
 
