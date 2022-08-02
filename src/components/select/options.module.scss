@@ -1,0 +1,15 @@
+@use 'sass:math';
+
+@import 'variables';
+
+.options {
+  background-color: $color-background;
+  box-shadow: 0 0 ($size-border * 3) $color-border;
+  border-radius: $size-radius;
+  list-style: none;
+  position: absolute;
+  margin: 0;
+  padding: $size-padding * 1.5;
+  top: calc(100% + #{math.round(math.div($size-base, 2))});
+  width: 100%;
+}

@@ -5,12 +5,12 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import Select from './Select';
 
 const options = [
-  { label: 'Education 🎓', text: 'Education' },
-  { label: 'Yeeeah, science! 🚀', text: 'Science' },
-  { label: 'Art 🎭', text: 'Art' },
-  { label: 'Sport ⚽', text: 'Sport' },
-  { label: 'Game 🎮', text: 'Game' },
-  { label: 'Health 👨‍⚕️', text: 'Health' },
+  'Education 🎓',
+  'Yeeeah, science! 🚀',
+  'Art 🎭',
+  'Sport ⚽',
+  'Game 🎮',
+  'Health 👨‍⚕️',
 ];
 
 describe('Select', () => {
@@ -20,80 +20,166 @@ describe('Select', () => {
     expect(screen.queryByTestId('menu')).toBeFalsy();
   });
 
-  test('should not have text by default', () => {
+  test('should not have `placeholder` by default', () => {
     render(<Select options={options} />);
 
-    const text = screen.getByTestId('text');
-
-    expect(text.textContent).toEqual('');
+    expect(screen.getByTestId('input').getAttribute('placeholder')).toEqual('');
   });
 
-  test('should not have text by if there is `placeholder`', () => {
-    const placeholder = "Select a field";
-    render(<Select options={options} placeholder={placeholder} />);
+  test('should have `placeholder`', () => {
+    const placeholder = 'select something!'
+    
+    render(
+      <Select
+        options={options}
+        placeholder={placeholder}
+      />
+    );
 
-    const text = screen.getByTestId('text');
-
-    expect(text.textContent).toEqual(placeholder);
+    expect(screen.getByTestId('input').getAttribute('placeholder')).toEqual(placeholder);
   });
 
-  test('should open menu on click on button and close it on next click', () => {
+  test('should open menu on click on `wrapper` and close it on next click', () => {
     render(<Select options={options} />);
 
-    const btn = screen.getByTestId('button');
-    fireEvent.click(btn);
+    const wrapper = screen.getByTestId('wrapper');
+    fireEvent.click(wrapper);
     expect(screen.getByTestId('menu')).toBeTruthy();
 
-    fireEvent.click(btn);
+    fireEvent.click(wrapper);
     expect(screen.queryByTestId('menu')).toBeFalsy();
   });
 
   test('should open menu on `ArrowDown`', () => {
     render(<Select options={options} />);
 
-    const btn = screen.getByTestId('button');
-    fireEvent.keyDown(btn, { key: 'ArrowDown' });
+    const wrapper = screen.getByTestId('wrapper');
+    fireEvent.keyDown(wrapper, { key: 'ArrowDown' });
     expect(screen.getByTestId('menu')).toBeTruthy();
   });
 
   test('should open menu on `ArrowUp`', () => {
     render(<Select options={options} />);
 
-    const btn = screen.getByTestId('button');
-    fireEvent.keyDown(btn, { key: 'ArrowUp' });
+    const wrapper = screen.getByTestId('wrapper');
+    fireEvent.keyDown(wrapper, { key: 'ArrowUp' });
     expect(screen.getByTestId('menu')).toBeTruthy();
   });
 
   test('should close menu on `Escape`', () => {
     render(<Select options={options} />);
 
-    const btn = screen.getByTestId('button');
-    fireEvent.keyDown(btn, { key: 'Enter' });
+    const wrapper = screen.getByTestId('wrapper');
+    fireEvent.keyDown(wrapper, { key: 'ArrowDown' });
+    expect(screen.getByTestId('menu')).toBeTruthy();
 
-    fireEvent.keyDown(btn, { key: 'Escape' });
+    fireEvent.keyDown(wrapper, { key: 'Escape' });
     expect(screen.queryByTestId('menu')).toBeFalsy();
   });
 
   test('should have `options` onto menu', () => {
     render(<Select options={options} />);
 
-    const btn = screen.getByTestId('button');
-    fireEvent.click(btn);
+    const wrapper = screen.getByTestId('wrapper');
+    fireEvent.click(wrapper);
 
     const items = screen.getAllByRole('listitem');
-    expect(items.map((item) => item.textContent)).toEqual(options.map(({ label }) => label));
+    expect(items.map((item) => item.textContent)).toEqual(options);
   });
 
-  test('should select third option on click on it', () => {
-    render(<Select options={options} />);
+  test('should select third option on `click` on it', () => {
+    const onChangeMock = jest.fn();
 
-    const btn = screen.getByTestId('button');
-    fireEvent.click(btn);
+    render(
+      <Select
+        options={options}
+        onChange={onChangeMock}
+      />
+    );
+
+    const wrapper = screen.getByTestId('wrapper');
+    fireEvent.click(wrapper);
+
     expect(screen.getByTestId('menu')).toBeTruthy();
 
-    const item = screen.getByText(options[2].label);
+    const item = screen.getByText(options[2]);
     fireEvent.click(item);
+
     expect(screen.queryByTestId('menu')).toBeFalsy();
-    expect(screen.getByTestId('text').textContent).toEqual(options[2].text);
+    expect(screen.getByTestId('input').getAttribute('value')).toEqual(options[2]);
+    expect(onChangeMock).toBeCalledTimes(1);
+    expect(onChangeMock.mock.calls[0][0]).toEqual(options[2]);
+    expect(onChangeMock.mock.calls[0][1]).toEqual(2);
+    expect(typeof onChangeMock.mock.calls[0][2]).toEqual('object');
+    expect(onChangeMock.mock.calls[0][3]).toEqual('click');
+  });
+
+  test('should select second option on `keyDown` (Enter) on it', () => {
+    const onChangeMock = jest.fn();
+
+    render(
+      <Select
+        options={options}
+        onChange={onChangeMock}
+      />
+    );
+
+    const wrapper = screen.getByTestId('wrapper');
+    fireEvent.click(wrapper);
+
+    expect(screen.getByTestId('menu')).toBeTruthy();
+
+    const item = screen.getByText(options[1]);
+    fireEvent.keyDown(item, { key: 'Enter' });
+
+    expect(screen.queryByTestId('menu')).toBeFalsy();
+    expect(screen.getByTestId('input').getAttribute('value')).toEqual(options[1]);
+    expect(onChangeMock).toBeCalledTimes(1);
+    expect(onChangeMock.mock.calls[0][0]).toEqual(options[1]);
+    expect(onChangeMock.mock.calls[0][1]).toEqual(1);
+    expect(typeof onChangeMock.mock.calls[0][2]).toEqual('object');
+    expect(onChangeMock.mock.calls[0][3]).toEqual('enter');
+  });
+
+  test('should add to options on `keyDown` (Enter) on input', () => {
+    render(<Select options={options} />);
+
+    const value = 'Something new!';
+    const input = screen.getByTestId('input');
+    fireEvent.change(input, { target: { value }});
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    const items = screen.getAllByRole('listitem');
+    expect(items.map((item) => item.textContent)).toEqual([...options, value]);
+  });
+
+  test('should add to options on `keyDown` (Enter) on input if options exists', () => {
+    render(<Select options={options} />);
+
+    const value = 'Art 🎭';
+    const input = screen.getByTestId('input');
+    fireEvent.change(input, { target: { value }});
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    const items = screen.getAllByRole('listitem');
+    expect(items.map((item) => item.textContent)).toEqual([...options, value]);
+  });
+
+  test('should not add to options on `keyDown` (Enter) on input if options exists and `uniqueNewItem` is `true`', () => {
+    render(
+      <Select
+        options={options}
+        uniqueNewItem
+      />,
+    );
+
+    const value = 'Art 🎭';
+    const input = screen.getByTestId('input');
+    fireEvent.change(input, { target: { value }});
+    fireEvent.keyDown(input, { key: 'Enter' });
+    fireEvent.keyDown(input, { key: 'ArrowUp' });
+
+    const items = screen.getAllByRole('listitem');
+    expect(items.map((item) => item.textContent)).toEqual(options);
   });
 });

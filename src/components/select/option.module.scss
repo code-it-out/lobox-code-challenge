@@ -1,0 +1,20 @@
+@import 'variables';
+
+.option {
+  padding: $size-padding;
+  display: flex;
+  justify-content: space-between;
+
+  &.selected,
+  &:hover,
+  &:focus {
+    background-color: rgba($color-border, 0.15);
+  }
+
+  &.selected {
+    color: $color-active;
+    &::after {
+      content: '\2713';
+    }
+  }
+}

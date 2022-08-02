@@ -1,26 +1,29 @@
 import React from 'react';
 
 import { Components } from '../../types';
-import Select from '../select/Select';
+import { Select } from '../select';
 
 function App() {
-  const onChange = (option: Components.Select.Option) => {
-    console.log('onChange', option);
+  const onChange = (option?: Components.Select.OptionType, index?: number) => {
+    console.log('option', option);
+    console.log('index', index);
   };
 
   return (
     <div style={{ padding: '20px' }}>
       <Select
         options={[
-          { label: 'Education 🎓', text: 'Education' },
-          { label: 'Yeeeah, science! 🚀', text: 'Science' },
-          { label: 'Art 🎭', text: 'Art' },
-          { label: 'Sport ⚽', text: 'Sport' },
-          { label: 'Game 🎮', text: 'Game' },
-          { label: 'Health 👨‍⚕️', text: 'Health' },
+          'Education 🎓',
+          'Yeeeah, science! 🚀',
+          'Art 🎭',
+          'Sport ⚽',
+          'Game 🎮',
+          'Health 👨‍⚕️',
         ]}
+        // options={[]}
         onChange={onChange}
         placeholder="Select an item..."
+        uniqueNewItem
       />
     </div>
   );

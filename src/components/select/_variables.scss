@@ -1,0 +1,9 @@
+@use 'sass:math';
+
+$color-border: gray;
+$color-background: white;
+$color-active: #007bff;
+$size-base: 16px;
+$size-radius: math.round(math.div($size-base, 2) * 1.25);
+$size-padding: math.round(math.div($size-base, 2));
+$size-border: 1px;

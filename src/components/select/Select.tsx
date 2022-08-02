@@ -6,112 +6,108 @@ import styles from './select.module.scss';
 import { Components } from '../../types';
 import { useClickOutside, usePressEsc } from '../../hooks';
 
-export const handleChange = () => null;
+import Options from './Options';
+
+export const onChangePlaceHolder = () => null;
 
 export function Select({
-  options,
+  options = [],
   placeholder = '',
-  onChange = handleChange,
+  uniqueNewItem = false,
+  onChange = onChangePlaceHolder,
 }: Components.Select.Props) {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [items, setItems] = React.useState(options);
+  const [value, setValue] = React.useState('');
 
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const menuRef = React.useRef<HTMLUListElement>(null);
   const focusedItemRef = React.useRef(-1);
-  const selectedItemRef = React.useRef(-1);
 
   const closeMenu = React.useCallback(() => {
     if (isOpen) {
       setIsOpen(false);
-      buttonRef?.current?.focus();
+      inputRef.current?.focus();
     }
-  }, [isOpen, buttonRef]);
+  }, [isOpen, inputRef]);
 
-  useClickOutside(buttonRef, closeMenu);
+  useClickOutside(wrapperRef, closeMenu);
   usePressEsc(closeMenu);
 
-  const handleClickOnButton = () => {
+  const onClickOnWrapper = () => {
     setIsOpen((open) => !open);
-    buttonRef?.current?.focus();
-  };
+    inputRef.current?.focus();
+  }
 
-  const handleKeyDownOnButton = (evt: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (!isOpen && ['ArrowUp', 'ArrowDown'].includes(evt.key)) {
+  const handleKeyDownOnWrapper = (evt: React.KeyboardEvent<HTMLDivElement>) => {
+    const isArrowUp = 'ArrowUp' === evt.key;
+    const isArrowDown = 'ArrowDown' === evt.key;
+    const isArrow = isArrowUp || isArrowDown;
+    
+    if (!isOpen && isArrow) {
       setIsOpen(true);
       return;
     }
 
-    if (evt.key === 'ArrowUp' && focusedItemRef.current > 0) {
+    if (isArrowUp && focusedItemRef.current > 0) {
       focusedItemRef.current -= 1;
     }
-    if (evt.key === 'ArrowDown' && focusedItemRef.current < options.length - 1) {
+    if (isArrowDown && focusedItemRef.current < items.length - 1) {
       focusedItemRef.current += 1;
     }
 
-    if (focusedItemRef.current > -1) {
-      const items = menuRef?.current?.querySelectorAll('li') || [];
+    if (focusedItemRef.current > -1 && isArrow) {
+      const items = menuRef.current?.querySelectorAll('li') || [];
       items[focusedItemRef.current]?.focus();
     }
   };
 
-  const doChange = () => {
-    selectedItemRef.current = focusedItemRef.current;
-    onChange(options[selectedItemRef.current]);
-    buttonRef?.current?.focus();
-  };
+  const handleChangeInput = (evt: React.KeyboardEvent<HTMLInputElement>) => {
+    setValue(evt.target.value);
+  }
 
-  const handleClickOnItem = (evt: React.MouseEvent<HTMLLIElement>) => {
-    const target = evt.target as HTMLLIElement;
-    focusedItemRef.current = Array.from(target?.parentElement?.children || []).indexOf(target);
-    doChange();
-  };
+  const handleKeyDownOnInput = (evt: React.KeyboardEvent<HTMLInputElement>) => {
+    if (evt.key !== 'Enter' || !value || (uniqueNewItem && items.includes(value))) { return; }
 
-  const handleKeyDownOnItem = (evt: React.KeyboardEvent<HTMLLIElement>) => {
-    if (evt.key === 'Enter') { doChange(); }
-  };
+    setItems([...items, value]);
+    setValue('');
+    setIsOpen(true);
+  }
+
+  const handleChangeOption: Components.Select.Options.Props['onChange'] = (option, index, evt, reason) => {
+    onChange(option, index, evt, reason);
+    setValue(option || '');
+    inputRef.current?.focus();
+    if (reason !== 'click') { setIsOpen(false); }
+  }
 
   return (
-    <button
-      className={classNames(styles.button, { [styles.active]: isOpen })}
+    <div
+      className={classNames(styles.wrapper, { [styles.active]: isOpen })}
+      onClick={onClickOnWrapper}
+      onKeyDown={handleKeyDownOnWrapper}
+      ref={wrapperRef}
       aria-haspopup="true"
-      onClick={handleClickOnButton}
-      onKeyDown={handleKeyDownOnButton}
-      ref={buttonRef}
-      data-testid="button"
+      data-testid="wrapper"
     >
-      <span
-        className={classNames(styles.text, {
-          [styles.placeholder]: selectedItemRef.current === -1,
-        })}
-        data-testid="text"
-      >
-        {options[selectedItemRef.current]?.text || placeholder}
-      </span>
+      <input
+        className={styles.input}
+        placeholder={placeholder}
+        value={value}
+        ref={inputRef}
+        onChange={handleChangeInput}
+        onKeyDown={handleKeyDownOnInput}
+        data-testid="input"
+      />
       <span className={classNames(styles.indicator, { [styles.up]: isOpen })} />
-      {
-        isOpen && (
-          <ul
-            className={classNames(styles.menu, { [styles.close]: !isOpen })}
-            ref={menuRef}
-            data-testid="menu"
-          >
-            {options.map((option, ii) => (
-              <li
-                key={option.uid || ii}
-                className={classNames({
-                  [styles.selected]: ii === selectedItemRef.current,
-                })}
-                onKeyDown={handleKeyDownOnItem}
-                onClick={handleClickOnItem}
-                tabIndex={0}
-              >
-                {option.label || option.text}
-              </li>
-            ))}
-          </ul>
-        )
-      }
-    </button>
+      <Options
+        isOpen={isOpen && Boolean(items.length)}
+        options={items}
+        ref={menuRef}
+        onChange={handleChangeOption}
+      />
+    </div>
   );
 }
 
