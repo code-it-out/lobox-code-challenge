@@ -80,7 +80,7 @@ export function Select({
   }
 
   const handleChangeOption: Components.Select.Options.Props['onChange'] = (option, index, evt, reason) => {
-    onChange(option, index, evt, reason);
+    onChange(option, index, items, evt, reason);
     setValue(option || '');
     inputRef.current?.focus();
     if (reason !== 'click') { setIsOpen(false); }

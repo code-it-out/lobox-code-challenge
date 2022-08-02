@@ -9,6 +9,7 @@ export namespace Hooks {
 export namespace Components {
   namespace Select {
     type OptionType = string;
+    type OptionsType = OptionType[];
 
     namespace Option {
       interface Props {
@@ -27,14 +28,16 @@ export namespace Components {
 
       interface Props {
         isOpen?: boolean;
-        options?: OptionType[];
+        options?: OptionsType;
         menuRef?: React.ForwardedRef<HTMLUListElement>;
         onChange?: (option?: OptionType, index?: number, evt?: SelectEvent, reason?: SelectReason) => void;
       }
     }
 
-    interface Props extends Pick<Options.Props, 'onChange' | 'options'> {
+    interface Props {
+      options?: OptionsType;
       placeholder?: string;
+      onChange?: (option?: OptionType, index?: number, options?: OptionsType, evt?: SelectEvent, reason?: SelectReason) => void;
       duplicateOptionErrorHandler?: (value?: OptionType) => void;
     }
   }

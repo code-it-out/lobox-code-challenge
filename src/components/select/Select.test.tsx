@@ -110,8 +110,9 @@ describe('Select', () => {
     expect(onChangeMock).toBeCalledTimes(1);
     expect(onChangeMock.mock.calls[0][0]).toEqual(options[2]);
     expect(onChangeMock.mock.calls[0][1]).toEqual(2);
-    expect(typeof onChangeMock.mock.calls[0][2]).toEqual('object');
-    expect(onChangeMock.mock.calls[0][3]).toEqual('click');
+    expect(onChangeMock.mock.calls[0][2]).toEqual(options);
+    expect(typeof onChangeMock.mock.calls[0][3]).toEqual('object');
+    expect(onChangeMock.mock.calls[0][4]).toEqual('click');
   });
 
   test('should select second option on `keyDown` (Enter) on it', () => {
@@ -137,8 +138,9 @@ describe('Select', () => {
     expect(onChangeMock).toBeCalledTimes(1);
     expect(onChangeMock.mock.calls[0][0]).toEqual(options[1]);
     expect(onChangeMock.mock.calls[0][1]).toEqual(1);
-    expect(typeof onChangeMock.mock.calls[0][2]).toEqual('object');
-    expect(onChangeMock.mock.calls[0][3]).toEqual('enter');
+    expect(onChangeMock.mock.calls[0][2]).toEqual(options);
+    expect(typeof onChangeMock.mock.calls[0][3]).toEqual('object');
+    expect(onChangeMock.mock.calls[0][4]).toEqual('enter');
   });
 
   test('should add to options on `keyDown` (Enter) on input', () => {
