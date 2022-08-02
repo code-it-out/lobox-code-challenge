@@ -153,7 +153,7 @@ describe('Select', () => {
     expect(items.map((item) => item.textContent)).toEqual([...options, value]);
   });
 
-  test('should add to options on `keyDown` (Enter) on input if options exists', () => {
+  test('should add to options on `keyDown` (Enter) on input even if option exists', () => {
     render(<Select options={options} />);
 
     const value = 'Art 🎭';
@@ -165,11 +165,13 @@ describe('Select', () => {
     expect(items.map((item) => item.textContent)).toEqual([...options, value]);
   });
 
-  test('should not add to options on `keyDown` (Enter) on input if options exists and `uniqueNewItem` is `true`', () => {
+  test('should not add to options on `keyDown` (Enter) on input if option exists and `duplicateOptionErrorHandler` is a callback', () => {
+    const duplicateOptionErrorHandlerMock = jest.fn();
+
     render(
       <Select
         options={options}
-        uniqueNewItem
+        duplicateOptionErrorHandler={duplicateOptionErrorHandlerMock}
       />,
     );
 
@@ -181,5 +183,8 @@ describe('Select', () => {
 
     const items = screen.getAllByRole('listitem');
     expect(items.map((item) => item.textContent)).toEqual(options);
+
+    expect(duplicateOptionErrorHandlerMock).toBeCalledTimes(1);
+    expect(duplicateOptionErrorHandlerMock).toBeCalledWith(value);
   });
 });

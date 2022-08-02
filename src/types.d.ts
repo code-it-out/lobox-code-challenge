@@ -35,7 +35,7 @@ export namespace Components {
 
     interface Props extends Pick<Options.Props, 'onChange' | 'options'> {
       placeholder?: string;
-      uniqueNewItem?: boolean;
+      duplicateOptionErrorHandler?: (value?: OptionType) => void;
     }
   }
 }

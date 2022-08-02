@@ -13,7 +13,7 @@ export const onChangePlaceHolder = () => null;
 export function Select({
   options = [],
   placeholder = '',
-  uniqueNewItem = false,
+  duplicateOptionErrorHandler,
   onChange = onChangePlaceHolder,
 }: Components.Select.Props) {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -68,7 +68,11 @@ export function Select({
   }
 
   const handleKeyDownOnInput = (evt: React.KeyboardEvent<HTMLInputElement>) => {
-    if (evt.key !== 'Enter' || !value || (uniqueNewItem && items.includes(value))) { return; }
+    if (evt.key !== 'Enter' || !value) { return; }
+    if (duplicateOptionErrorHandler && items.includes(value)) {
+      duplicateOptionErrorHandler(value);
+      return;
+    };
 
     setItems([...items, value]);
     setValue('');

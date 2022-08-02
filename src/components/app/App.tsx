@@ -9,6 +9,10 @@ function App() {
     console.log('index', index);
   };
 
+  const onDuplicateOption = (value?: Components.Select.OptionType) => {
+    console.log('error value', value);
+  }
+
   return (
     <div style={{ padding: '20px' }}>
       <Select
@@ -23,7 +27,7 @@ function App() {
         // options={[]}
         onChange={onChange}
         placeholder="Select an item..."
-        uniqueNewItem
+        duplicateOptionErrorHandler={onDuplicateOption}
       />
     </div>
   );
